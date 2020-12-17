@@ -1,5 +1,6 @@
 "use strict";
 
+const { merge } = require("lodash");
 const constants = require("../utils/constants");
 
 const env = process.env.NODE_ENV || constants.DEVELOPMENT;
@@ -11,4 +12,14 @@ const baseConfig = {
   port: 5000,
 };
 
-module.exports = Object.freeze(baseConfig);
+let envConfig = {};
+
+switch (env) {
+  case constants.DEVELOPMENT:
+    envConfig = require("./dev");
+    break;
+  default:
+    envConfig = require("./dev");
+}
+
+module.exports = Object.freeze(merge(baseConfig, envConfig));
