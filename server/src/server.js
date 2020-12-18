@@ -7,6 +7,7 @@ const morgan = require("morgan");
 const config = require("./config");
 const connect = require("./db");
 const travelLogRouter = require("./resources/travel-log/travelLog.router");
+const middlewares = require("./middlewares");
 
 const app = express();
 
@@ -26,20 +27,9 @@ app.get("/", (req, res) => {
 
 app.use("/api/logs", travelLogRouter);
 
-app.use(function notFound(req, res, next) {
-  const error = new Error("Not Found");
-  res.status(404);
-  next(error);
-});
+app.use(middlewares.notFound);
 
-// eslint-disable-next-line no-unused-vars
-app.use(function errorHandler(err, req, res, next) {
-  // If status is set in previous middleware return that status else set it to 500.
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  return res
-    .status(statusCode)
-    .json({ message: err.message, stack: config.isDev && err.stack });
-});
+app.use(middlewares.errorHandler);
 
 function start() {
   connect(config.dbUrl)
