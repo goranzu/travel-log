@@ -31,7 +31,7 @@ travelLogRouter
   })
   .get(async function getAll(req, res, next) {
     try {
-      const logEntries = await TravelLog.find().limit(10).exec();
+      const logEntries = await TravelLog.find().limit(100).exec();
       return res.status(200).json({ data: logEntries });
     } catch (error) {
       next(error);

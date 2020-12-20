@@ -12,21 +12,23 @@ code {
     monospace;
 }
 
-.mapContainer {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
+.map-marker {
+  cursor: pointer;
 }
 
-.info {
+.marker-button {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+}
+
+.sr-only:not(:focus):not(:active) {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
   position: absolute;
-  background-color: #eee;
-  left: 10px;
-  top: 10px;
-  z-index: 1000;
-  padding: 0.3em;
-  border-radius: 5px;
-  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+  width: 1px;
 }
