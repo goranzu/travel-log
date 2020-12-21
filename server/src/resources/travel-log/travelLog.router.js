@@ -19,9 +19,9 @@ travelLogRouter
           coordinates: [req.body.latitude, req.body.longitude],
         },
       };
-      const log = await TravelLog.create(location);
+      await TravelLog.create(location);
 
-      return res.status(201).json({ data: log.toJSON() });
+      return res.status(201).end();
     } catch (error) {
       if (error.name === constants.VALIDATION_ERROR) {
         res.status(400);
