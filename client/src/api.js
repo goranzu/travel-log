@@ -17,7 +17,7 @@ async function apiClient(url, body) {
     return data;
   }
 
-  const error = new Error("Error fetching data.");
+  const error = new Error(data.message || "Error fetching data.");
   error.response = data;
   throw error;
 }

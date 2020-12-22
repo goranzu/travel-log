@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import ReactMapGL, { Marker, Popup } from "react-map-gl";
+import ReactMapGL, { Marker, Popup, FlyToInterpolator } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { REJECTED, RESOLVED } from "./constants";
 import useGetLocations from "./hooks/useGetLocations";
 import usePostLocation from "./hooks/usePostLocation";
+import Sidebar from "./components/Sidebar";
 
 function App() {
   const [viewport, setViewport] = useState({
@@ -17,7 +18,13 @@ function App() {
   const token = process.env.REACT_APP_MAPBOX_KEY;
   const [newMapLocation, setNewMapLocation] = useState(null);
   const [getLocationState, getLocations] = useGetLocations();
-  const [postLocationState, postLocation] = usePostLocation();
+  const [
+    postLocationState,
+    postLocation,
+    resetPostLocationState,
+  ] = usePostLocation();
+  const [openSidebar, setOpenSidebar] = useState(false);
+  const [validationError, setValidationError] = useState("");
 
   const offset = {
     offsetLeft: -15,
@@ -37,20 +44,42 @@ function App() {
   function handleAddMapMarker(e) {
     const [longitude, latitude] = e.lngLat;
     setNewMapLocation({ latitude, longitude });
+    setOpenSidebar(true);
+    setViewport({
+      ...viewport,
+      latitude,
+      longitude,
+      transitionDuration: 1000,
+      transitionInterpolator: new FlyToInterpolator(),
+    });
   }
 
-  async function handleSubmit(e) {
-    // TODO: Add visitDate
-    // TODO: Maybe slide out the form from the side
-    e.preventDefault();
-    const title = e.target.title.value;
+  async function handleSubmit({ title, visitDate }) {
     const { latitude, longitude } = newMapLocation;
-    await postLocation({ title, latitude, longitude });
+    if (title.length === 0 || visitDate.length === 0) {
+      setValidationError("Please complete the form.");
+      return;
+    }
+    await postLocation({ title, latitude, longitude, visitDate });
+    setValidationError("");
+  }
+
+  function handleSidebarClose() {
+    resetPostLocationState();
+    setValidationError("");
+    setOpenSidebar(false);
   }
 
   return (
     <>
       {getLocationState.status === REJECTED && <p>{getLocationState.error}</p>}
+      <Sidebar
+        openSidebar={openSidebar}
+        handleSubmit={handleSubmit}
+        error={postLocationState.error}
+        handleSidebarClose={handleSidebarClose}
+        validationError={validationError}
+      />
       <ReactMapGL
         {...viewport}
         mapboxApiAccessToken={token}
@@ -104,23 +133,6 @@ function App() {
               )}
             </React.Fragment>
           ))}
-        {newMapLocation && (
-          <Popup
-            latitude={newMapLocation.latitude}
-            longitude={newMapLocation.longitude}
-            closeButton={true}
-            closeOnClick={false}
-            onClose={() => setNewMapLocation(null)}
-            anchor="top"
-          >
-            <form onSubmit={handleSubmit}>
-              <h5>New Map Location</h5>
-              <label htmlFor="title">Title:</label>
-              <input name="title" id="title" type="text" placeholder="title" />
-              <button type="submit">Send</button>
-            </form>
-          </Popup>
-        )}
       </ReactMapGL>
     </>
   );

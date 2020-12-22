@@ -34,7 +34,11 @@ function usePostLocation() {
       dispatch({ type: REJECTED, payload: { error: error.message } });
     }
   }
-  return [state, postLocation];
+
+  function reset() {
+    dispatch({ type: IDLE });
+  }
+  return [state, postLocation, reset];
 }
 
 export default usePostLocation;

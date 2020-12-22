@@ -24,6 +24,7 @@ const travelLogSchema = new mongoose.Schema(
     },
     visitDate: {
       type: Date,
+      required: true
     },
   },
   { timestamps: true },
